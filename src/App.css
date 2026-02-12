@@ -1,0 +1,14 @@
+.app-wrapper {
+  opacity: 1;
+  transition: opacity 0.1s;
+}
+
+.app-hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.app-visible {
+  opacity: 1;
+  pointer-events: auto;
+}
