@@ -1,0 +1,173 @@
+.expanding-cards {
+  display: flex;
+  gap: 0.5rem;
+  height: 70vh;
+  min-height: 500px;
+  width: 100%;
+}
+
+.expanding-card {
+  flex: 0 0 80px;
+  overflow: hidden;
+  border-radius: var(--radius-lg);
+  transition: flex 0.7s var(--ease-out-expo);
+  cursor: pointer;
+  position: relative;
+  background: var(--bg-dark-secondary);
+  border: 1px solid var(--border-light);
+}
+
+.expanding-card.active {
+  flex: 1 1 0;
+}
+
+/* Background image */
+.expanding-card-bg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+
+.expanding-card.active .expanding-card-bg {
+  opacity: 1;
+}
+
+.expanding-card-bg img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.expanding-card-bg-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(180deg,
+      rgba(12, 10, 9, 0.1) 0%,
+      rgba(12, 10, 9, 0.85) 80%);
+}
+
+/* Vertical text (inactive state) */
+.expanding-card-vertical {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5rem;
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  transform: rotate(180deg);
+  opacity: 1;
+  transition: opacity 0.3s ease;
+  padding: 2rem 0;
+}
+
+.expanding-card.active .expanding-card-vertical {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.expanding-card-vertical-num {
+  font-family: var(--font-display);
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--terracotta);
+}
+
+.expanding-card-vertical-title {
+  font-family: var(--font-heading);
+  font-size: 1rem;
+  color: var(--text-light-muted);
+  letter-spacing: 0.05em;
+}
+
+/* Expanded content */
+.expanding-card-content {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  padding: 2.5rem;
+  z-index: 2;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.5s ease 0.2s, transform 0.5s var(--ease-out-expo) 0.2s;
+}
+
+.expanding-card.active .expanding-card-content {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.expanding-card-num {
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--terracotta);
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.expanding-card-title {
+  font-family: var(--font-display);
+  font-size: clamp(1.5rem, 2.5vw, 2.5rem);
+  font-weight: 700;
+  color: var(--text-light);
+  margin-bottom: 0.75rem;
+}
+
+.expanding-card-desc {
+  font-size: 0.9rem;
+  color: var(--text-light-muted);
+  line-height: 1.6;
+  max-width: 400px;
+}
+
+.expanding-card-price {
+  display: inline-block;
+  margin-top: 1rem;
+  padding: 0.4rem 1.2rem;
+  background: var(--saffron);
+  color: var(--bg-dark);
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 0.85rem;
+  border-radius: var(--radius-pill);
+}
+
+/* Mobile: vertical stack */
+@media (max-width: 768px) {
+  .expanding-cards {
+    flex-direction: column;
+    height: auto;
+  }
+
+  .expanding-card {
+    flex: 0 0 auto !important;
+    height: 300px;
+  }
+
+  .expanding-card-vertical {
+    display: none;
+  }
+
+  .expanding-card-bg {
+    opacity: 1;
+  }
+
+  .expanding-card-content {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

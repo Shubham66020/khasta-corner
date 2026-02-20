@@ -1,0 +1,32 @@
+.marquee {
+  overflow: hidden;
+  white-space: nowrap;
+  position: relative;
+}
+
+.marquee-track {
+  display: inline-flex;
+  align-items: center;
+  will-change: transform;
+}
+
+.marquee-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 1.5rem;
+  padding-right: 1.5rem;
+  flex-shrink: 0;
+}
+
+.marquee-text {
+  font-family: var(--font-heading);
+  font-style: italic;
+  font-size: clamp(1.2rem, 2vw, 1.8rem);
+  color: var(--text-light);
+}
+
+.marquee-separator {
+  color: var(--terracotta);
+  font-size: 0.8rem;
+  opacity: 0.6;
+}

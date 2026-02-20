@@ -6,6 +6,8 @@ import Lenis from 'lenis'
 import Navbar from './components/Navbar'
 import Footer from './components/Footer'
 import LoadingScreen from './components/LoadingScreen'
+import CustomCursor from './components/CustomCursor'
+import PageTransition from './components/PageTransition'
 import Home from './pages/Home'
 import Menu from './pages/Menu'
 import Story from './pages/Story'
@@ -30,13 +32,6 @@ function App() {
     })
 
     lenisRef.current = lenis
-
-    function raf(time) {
-      lenis.raf(time)
-      requestAnimationFrame(raf)
-    }
-
-    requestAnimationFrame(raf)
 
     // Connect Lenis to GSAP ScrollTrigger
     lenis.on('scroll', ScrollTrigger.update)
@@ -65,18 +60,21 @@ function App() {
 
   return (
     <>
+      <CustomCursor />
       <div className="noise-overlay" />
       {isLoading && <LoadingScreen onComplete={handleLoadingComplete} />}
       <div className={`app-wrapper ${isLoading ? 'app-hidden' : 'app-visible'}`}>
         <Navbar />
-        <main>
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/menu" element={<Menu />} />
-            <Route path="/story" element={<Story />} />
-            <Route path="/contact" element={<Contact />} />
-          </Routes>
-        </main>
+        <PageTransition>
+          <main>
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/menu" element={<Menu />} />
+              <Route path="/story" element={<Story />} />
+              <Route path="/contact" element={<Contact />} />
+            </Routes>
+          </main>
+        </PageTransition>
         <Footer />
       </div>
     </>

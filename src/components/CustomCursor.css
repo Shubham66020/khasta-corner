@@ -1,0 +1,46 @@
+.custom-cursor {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 99999;
+  pointer-events: none;
+}
+
+.cursor-outer {
+  width: 30px;
+  height: 30px;
+  border: 1.5px solid rgba(245, 237, 227, 0.8);
+  border-radius: 50%;
+  position: fixed;
+  top: 0;
+  left: 0;
+  mix-blend-mode: difference;
+  will-change: transform;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.cursor-inner {
+  width: 8px;
+  height: 8px;
+  background: var(--terracotta);
+  border-radius: 50%;
+  position: fixed;
+  top: 0;
+  left: 0;
+  will-change: transform;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+@media (max-width: 768px) {
+  .custom-cursor {
+    display: none !important;
+  }
+}
+
+@media (pointer: coarse) {
+  .custom-cursor {
+    display: none !important;
+  }
+}

@@ -1,0 +1,17 @@
+.rotating-badge {
+  display: inline-block;
+  will-change: transform;
+}
+
+.rotating-badge svg {
+  display: block;
+}
+
+.badge-text {
+  font-family: var(--font-body);
+  font-size: 0.62rem;
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  fill: var(--text-light);
+}

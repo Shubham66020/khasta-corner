@@ -1,6 +1,10 @@
 import { useEffect, useRef, useState } from 'react'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
+import TextReveal from '../components/TextReveal'
+import ParallaxImage from '../components/ParallaxImage'
+import SvgWave from '../components/SvgWave'
+import MagneticButton from '../components/MagneticButton'
 import './Menu.css'
 
 const menuData = {
@@ -53,56 +57,61 @@ const categories = Object.keys(menuData)
 export default function Menu() {
     const [activeCategory, setActiveCategory] = useState(null)
     const pageRef = useRef(null)
-    const itemsRef = useRef(null)
+    const filterRef = useRef(null)
 
     useEffect(() => {
+        window.scrollTo(0, 0)
+
         const ctx = gsap.context(() => {
-            // Page header animation
-            gsap.from('.menu-header > *', {
-                y: 60,
-                opacity: 0,
-                stagger: 0.12,
-                duration: 0.9,
-                ease: 'power3.out',
-                delay: 0.2,
-            })
+            // Category pills stagger
+            gsap.fromTo('.category-pill',
+                { y: 20, opacity: 0 },
+                {
+                    y: 0,
+                    opacity: 1,
+                    stagger: 0.05,
+                    duration: 0.5,
+                    ease: 'power3.out',
+                    delay: 0.4,
+                }
+            )
 
-            // Category pills animation
-            gsap.from('.category-pill', {
-                y: 30,
-                opacity: 0,
-                stagger: 0.06,
-                duration: 0.6,
-                ease: 'power3.out',
-                delay: 0.6,
-            })
-
-            // Menu sections stagger
+            // Menu sections stagger — use fromTo with opacity for reliability
             gsap.utils.toArray('.menu-category-section').forEach((section) => {
-                gsap.from(section, {
-                    y: 50,
-                    opacity: 0,
-                    duration: 0.8,
-                    ease: 'power3.out',
-                    scrollTrigger: {
-                        trigger: section,
-                        start: 'top 85%',
-                    },
-                })
+                gsap.fromTo(
+                    section.querySelector('.menu-category-header'),
+                    { y: 40, opacity: 0 },
+                    {
+                        y: 0,
+                        opacity: 1,
+                        duration: 0.7,
+                        ease: 'power3.out',
+                        scrollTrigger: {
+                            trigger: section,
+                            start: 'top 85%',
+                        },
+                    }
+                )
 
-                const items = section.querySelectorAll('.menu-item')
-                gsap.from(items, {
-                    y: 30,
-                    opacity: 0,
-                    stagger: 0.06,
-                    duration: 0.6,
-                    ease: 'power3.out',
-                    scrollTrigger: {
-                        trigger: section,
-                        start: 'top 80%',
-                    },
-                })
+                gsap.fromTo(
+                    section.querySelectorAll('.menu-card'),
+                    { y: 50, opacity: 0 },
+                    {
+                        y: 0,
+                        opacity: 1,
+                        stagger: 0.06,
+                        duration: 0.6,
+                        ease: 'power3.out',
+                        scrollTrigger: {
+                            trigger: section,
+                            start: 'top 80%',
+                        },
+                    }
+                )
             })
+
+            // Recalculate trigger positions after layout settles
+            gsap.delayedCall(0.1, () => ScrollTrigger.refresh())
         }, pageRef)
 
         return () => ctx.revert()
@@ -118,37 +127,64 @@ export default function Menu() {
 
     return (
         <div ref={pageRef} className="menu-page">
-            {/* Header */}
-            <section className="menu-hero section">
-                <div className="container">
-                    <div className="menu-header">
-                        <span className="text-label text-accent">What We Serve</span>
-                        <h1>
-                            Our <em>Menu</em>
-                        </h1>
-                        <p className="menu-subtitle">
-                            Every dish is made fresh, with care and the finest ingredients.
-                            From our signature khasta kachori to a warming cup of masala chai.
-                        </p>
+            {/* ===== HERO ===== */}
+            <ParallaxImage
+                src="https://images.unsplash.com/photo-1596797038530-2c107229654b?w=1600&q=80"
+                alt="Indian food spread"
+                height="70vh"
+                speed={0.3}
+                overlayOpacity={0.7}
+            >
+                <div className="menu-hero-content container">
+                    <span className="text-label text-accent">What We Serve</span>
+                    <div className="menu-hero-title">
+                        <TextReveal
+                            text="Our"
+                            mode="split-chars"
+                            tag="span"
+                            className="menu-title-word"
+                            trigger="load"
+                            stagger={0.04}
+                            duration={0.7}
+                            delay={0.3}
+                        />
+                        {' '}
+                        <TextReveal
+                            text="Menu"
+                            mode="stroke-fill"
+                            tag="span"
+                            className="menu-title-stroke"
+                            trigger="load"
+                            delay={0.6}
+                        />
                     </div>
+                    <p className="menu-hero-subtitle">
+                        Every dish is made fresh, with care and the finest ingredients.
+                        From our signature khasta kachori to a warming cup of masala chai.
+                    </p>
+                </div>
+            </ParallaxImage>
 
-                    {/* Category Filter */}
+            {/* ===== CATEGORY FILTER ===== */}
+            <div ref={filterRef} className="category-filter-bar">
+                <div className="container">
                     <div className="category-filter">
                         {categories.map((cat) => (
-                            <button
-                                key={cat}
-                                className={`category-pill ${activeCategory === cat ? 'active' : ''}`}
-                                onClick={() => scrollToCategory(cat)}
-                            >
-                                {cat}
-                            </button>
+                            <MagneticButton key={cat} strength={0.15}>
+                                <button
+                                    className={`category-pill ${activeCategory === cat ? 'active' : ''}`}
+                                    onClick={() => scrollToCategory(cat)}
+                                >
+                                    {cat}
+                                </button>
+                            </MagneticButton>
                         ))}
                     </div>
                 </div>
-            </section>
+            </div>
 
-            {/* Menu Items */}
-            <section ref={itemsRef} className="menu-items-section">
+            {/* ===== MENU ITEMS ===== */}
+            <section className="menu-items-section section">
                 <div className="container">
                     {categories.map((cat) => (
                         <div
@@ -160,22 +196,47 @@ export default function Menu() {
                                 <h2>{cat}</h2>
                                 <span className="menu-category-count">{menuData[cat].length} items</span>
                             </div>
-                            <div className="menu-items-list">
+                            <div className="menu-cards-grid">
                                 {menuData[cat].map((item, i) => (
-                                    <div key={i} className="menu-item">
-                                        <div className="menu-item-left">
-                                            <div className="menu-item-number">{String(i + 1).padStart(2, '0')}</div>
-                                            <div className="menu-item-info">
-                                                <h4 className="menu-item-name">{item.name}</h4>
-                                                <p className="menu-item-desc">{item.desc}</p>
-                                            </div>
+                                    <div key={i} className="menu-card">
+                                        <div className="menu-card-accent" />
+                                        <div className="menu-card-number">{String(i + 1).padStart(2, '0')}</div>
+                                        <div className="menu-card-body">
+                                            <h4 className="menu-card-name">{item.name}</h4>
+                                            <p className="menu-card-desc">{item.desc}</p>
                                         </div>
-                                        <div className="menu-item-price">{item.price}/-</div>
+                                        <div className="menu-card-price">
+                                            <span className="price-badge">{item.price}/-</span>
+                                        </div>
                                     </div>
                                 ))}
                             </div>
                         </div>
                     ))}
+                </div>
+            </section>
+
+            <SvgWave color="var(--bg-warm)" height={80} />
+
+            {/* ===== CTA ===== */}
+            <section className="menu-cta section section-warm">
+                <div className="container menu-cta-content">
+                    <span className="text-label" style={{ color: 'var(--terracotta)' }}>Can't Decide?</span>
+                    <TextReveal
+                        text="Try Our Specials"
+                        mode="split-words"
+                        tag="h2"
+                        className="menu-cta-title"
+                    />
+                    <p>Come in and let us guide you through the best of Khasta Corner.</p>
+                    <MagneticButton strength={0.3}>
+                        <a href="tel:9103777757" className="btn btn-primary">
+                            Call to Order
+                            <svg className="btn-arrow" viewBox="0 0 20 20" fill="none">
+                                <path d="M4 10H16M16 10L11 5M16 10L11 15" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                            </svg>
+                        </a>
+                    </MagneticButton>
                 </div>
             </section>
         </div>

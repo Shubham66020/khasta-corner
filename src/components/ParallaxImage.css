@@ -1,0 +1,42 @@
+.parallax-image {
+  width: 100%;
+  position: relative;
+  overflow: hidden;
+}
+
+.parallax-image-img {
+  width: 100%;
+  height: 120%;
+  object-fit: cover;
+  will-change: transform;
+  position: absolute;
+  top: -10%;
+  left: 0;
+}
+
+.parallax-image-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(180deg,
+      rgba(12, 10, 9, 0.2) 0%,
+      rgba(12, 10, 9, 0.7) 70%,
+      rgba(12, 10, 9, 0.9) 100%);
+  z-index: 1;
+  pointer-events: none;
+}
+
+.parallax-image-content {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}

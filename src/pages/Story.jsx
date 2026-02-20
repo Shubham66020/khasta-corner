@@ -2,109 +2,199 @@ import { useEffect, useRef } from 'react'
 import { Link } from 'react-router-dom'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
+import TextReveal from '../components/TextReveal'
+import MagneticButton from '../components/MagneticButton'
+import RotatingBadge from '../components/RotatingBadge'
+import ParallaxImage from '../components/ParallaxImage'
+import ExpandingCards from '../components/ExpandingCards'
+import SvgWave from '../components/SvgWave'
 import './Story.css'
+
+const values = [
+    {
+        title: 'Fresh, Always',
+        description: 'Every kachori is rolled and fried fresh. Every chai is brewed to order. We never compromise on freshness.',
+        price: '',
+        image: 'https://images.unsplash.com/photo-1596040033229-a9821ebd058d?w=800&q=80',
+    },
+    {
+        title: 'Honest Flavour',
+        description: 'No shortcuts, no artificial anything. Just real spices, real ingredients, and recipes perfected over time.',
+        price: '',
+        image: 'https://images.unsplash.com/photo-1505253758473-96b7015fcd40?w=800&q=80',
+    },
+    {
+        title: 'Warmth & Welcome',
+        description: 'We believe food tastes better served with warmth. Every guest at Khasta Corner is family.',
+        price: '',
+        image: 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=800&q=80',
+    },
+]
+
+const processSteps = [
+    {
+        num: '01',
+        title: 'Source',
+        desc: 'We carefully select fresh, local ingredients every single day.',
+        image: 'https://images.unsplash.com/photo-1596040033229-a9821ebd058d?w=800&q=80',
+    },
+    {
+        num: '02',
+        title: 'Prepare',
+        desc: 'Hand-rolled dough, hand-ground spices, made-to-order preparations.',
+        image: 'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=800&q=80',
+    },
+    {
+        num: '03',
+        title: 'Serve',
+        desc: 'Hot, fresh, with a smile. Every dish leaves our kitchen at its peak.',
+        image: 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=800&q=80',
+    },
+    {
+        num: '04',
+        title: 'Enjoy',
+        desc: 'The best part — watching our guests take that first, satisfying bite.',
+        image: 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=800&q=80',
+    },
+]
 
 export default function Story() {
     const pageRef = useRef(null)
+    const timelineRef = useRef(null)
+    const originRef = useRef(null)
+    const quoteRef = useRef(null)
+    const ctaRef = useRef(null)
 
     useEffect(() => {
-        const ctx = gsap.context(() => {
-            // Hero text reveal
-            gsap.from('.story-hero-content > *', {
-                y: 60,
-                opacity: 0,
-                stagger: 0.12,
-                duration: 0.9,
-                ease: 'power3.out',
-                delay: 0.2,
-            })
+        window.scrollTo(0, 0)
 
-            // Parallax hero image
-            gsap.to('.story-hero-img', {
-                yPercent: 20,
-                ease: 'none',
-                scrollTrigger: {
-                    trigger: '.story-hero',
-                    start: 'top top',
-                    end: 'bottom top',
-                    scrub: 0.5,
-                },
+        const ctx = gsap.context(() => {
+            // Hero slow zoom
+            gsap.fromTo('.story-hero-img', {
+                scale: 1.3,
+            }, {
+                scale: 1,
+                duration: 8,
+                ease: 'power2.out',
             })
 
             // Origin section
-            gsap.from('.origin-text > *', {
-                y: 50,
-                opacity: 0,
-                stagger: 0.1,
-                duration: 0.8,
-                ease: 'power3.out',
-                scrollTrigger: {
-                    trigger: '.origin-section',
-                    start: 'top 70%',
-                },
+            gsap.fromTo('.origin-text > *',
+                { y: 50, opacity: 0 },
+                {
+                    y: 0,
+                    opacity: 1,
+                    stagger: 0.12,
+                    duration: 0.8,
+                    ease: 'power3.out',
+                    scrollTrigger: {
+                        trigger: originRef.current,
+                        start: 'top 65%',
+                    },
+                }
+            )
+
+            // Timeline horizontal scroll (desktop only)
+            // Post-pin triggers MUST be inside matchMedia to account for pin spacing
+            const mm = gsap.matchMedia()
+            mm.add('(min-width: 769px)', () => {
+                const timelineEl = timelineRef.current
+                if (!timelineEl) return
+                const panels = timelineEl.querySelectorAll('.timeline-panel')
+                const totalWidth = panels.length * 100
+
+                gsap.to('.timeline-track', {
+                    xPercent: -(totalWidth - 100),
+                    ease: 'none',
+                    scrollTrigger: {
+                        trigger: timelineEl,
+                        start: 'top top',
+                        end: () => `+=${window.innerWidth * (panels.length - 1)}`,
+                        scrub: 1,
+                        pin: true,
+                        anticipatePin: 1,
+                    },
+                })
+
+                // Progress bar
+                gsap.to('.timeline-progress-fill', {
+                    scaleX: 1,
+                    ease: 'none',
+                    scrollTrigger: {
+                        trigger: timelineEl,
+                        start: 'top top',
+                        end: () => `+=${window.innerWidth * (panels.length - 1)}`,
+                        scrub: true,
+                    },
+                })
+
+                // Post-pin sections — created AFTER pin so positions account for pin spacing
+                gsap.fromTo('.story-quote-content > *',
+                    { y: 40, opacity: 0 },
+                    {
+                        y: 0,
+                        opacity: 1,
+                        stagger: 0.1,
+                        duration: 0.8,
+                        ease: 'power3.out',
+                        scrollTrigger: {
+                            trigger: quoteRef.current,
+                            start: 'top 70%',
+                        },
+                    }
+                )
+
+                gsap.fromTo('.story-cta-inner > *',
+                    { y: 40, opacity: 0 },
+                    {
+                        y: 0,
+                        opacity: 1,
+                        stagger: 0.1,
+                        duration: 0.8,
+                        ease: 'power3.out',
+                        scrollTrigger: {
+                            trigger: ctaRef.current,
+                            start: 'top 75%',
+                        },
+                    }
+                )
             })
 
-            gsap.from('.origin-image-wrapper', {
-                scale: 0.9,
-                opacity: 0,
-                duration: 1,
-                ease: 'power3.out',
-                scrollTrigger: {
-                    trigger: '.origin-section',
-                    start: 'top 65%',
-                },
+            // Mobile: no pin, create post-pin triggers normally
+            mm.add('(max-width: 768px)', () => {
+                gsap.fromTo('.story-quote-content > *',
+                    { y: 40, opacity: 0 },
+                    {
+                        y: 0,
+                        opacity: 1,
+                        stagger: 0.1,
+                        duration: 0.8,
+                        ease: 'power3.out',
+                        scrollTrigger: {
+                            trigger: quoteRef.current,
+                            start: 'top 70%',
+                        },
+                    }
+                )
+
+                gsap.fromTo('.story-cta-inner > *',
+                    { y: 40, opacity: 0 },
+                    {
+                        y: 0,
+                        opacity: 1,
+                        stagger: 0.1,
+                        duration: 0.8,
+                        ease: 'power3.out',
+                        scrollTrigger: {
+                            trigger: ctaRef.current,
+                            start: 'top 75%',
+                        },
+                    }
+                )
             })
 
-            // Values
-            gsap.from('.value-card', {
-                y: 60,
-                opacity: 0,
-                stagger: 0.12,
-                duration: 0.8,
-                ease: 'power3.out',
-                scrollTrigger: {
-                    trigger: '.values-grid',
-                    start: 'top 80%',
-                },
-            })
-
-            // Quote Section
-            gsap.from('.story-quote-text', {
-                y: 40,
-                opacity: 0,
-                duration: 1,
-                ease: 'power3.out',
-                scrollTrigger: {
-                    trigger: '.story-quote',
-                    start: 'top 70%',
-                },
-            })
-
-            // Philosophy section
-            gsap.from('.philosophy-item', {
-                y: 40,
-                opacity: 0,
-                stagger: 0.1,
-                duration: 0.7,
-                ease: 'power3.out',
-                scrollTrigger: {
-                    trigger: '.philosophy-section',
-                    start: 'top 75%',
-                },
-            })
-
-            // Final CTA
-            gsap.from('.story-cta-content > *', {
-                y: 40,
-                opacity: 0,
-                stagger: 0.1,
-                duration: 0.8,
-                ease: 'power3.out',
-                scrollTrigger: {
-                    trigger: '.story-cta',
-                    start: 'top 75%',
-                },
-            })
+            // Recalculate all trigger positions after pin is registered
+            gsap.delayedCall(0.2, () => ScrollTrigger.refresh())
         }, pageRef)
 
         return () => ctx.revert()
@@ -112,7 +202,7 @@ export default function Story() {
 
     return (
         <div ref={pageRef} className="story-page">
-            {/* Hero */}
+            {/* ===== HERO ===== */}
             <section className="story-hero">
                 <div className="story-hero-bg">
                     <img
@@ -124,20 +214,48 @@ export default function Story() {
                 </div>
                 <div className="container story-hero-content">
                     <span className="text-label text-accent">Our Story</span>
-                    <h1>
-                        A corner built <br />on <em>flavour</em>
-                    </h1>
-                    <p>
+                    <TextReveal
+                        text="A Corner Built on"
+                        mode="split-chars"
+                        tag="div"
+                        className="story-hero-title"
+                        trigger="load"
+                        stagger={0.03}
+                        duration={0.7}
+                        delay={0.3}
+                    />
+                    <div className="story-hero-title story-hero-title-2">
+                        <TextReveal
+                            text="Flavour"
+                            mode="stroke-fill"
+                            tag="span"
+                            className="story-hero-stroke"
+                            trigger="load"
+                            delay={0.8}
+                        />
+                    </div>
+                    <p className="story-hero-subtitle">
                         How a passion for authentic Indian street food became a
                         neighbourhood favourite.
                     </p>
                 </div>
             </section>
 
-            {/* Origin */}
-            <section className="origin-section section">
-                <div className="container grid-2 origin-grid">
+            {/* ===== ORIGIN ===== */}
+            <section ref={originRef} className="origin-section section">
+                <div className="container origin-grid">
+                    <ParallaxImage
+                        src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=800&q=80"
+                        alt="Artisan food preparation"
+                        speed={0.3}
+                        height="550px"
+                        borderRadius="var(--radius-lg)"
+                        revealOnScroll
+                    />
                     <div className="origin-text">
+                        <div className="origin-badge">
+                            <RotatingBadge size={100} />
+                        </div>
                         <span className="text-label text-accent">The Beginning</span>
                         <h2>
                             It started with a <em>kachori</em>
@@ -146,7 +264,7 @@ export default function Story() {
                             Khasta Corner was born from a love that runs deep in every Indian household
                             — the love for street food that tastes like it was made by someone who
                             truly cares. The kind of kachori that shatters into golden flakes the moment
-                            you bite in. The kind of chai that warms you from the inside out.
+                            you bite in.
                         </p>
                         <p>
                             We saw that the best street food traditions were fading in the rush of modern
@@ -155,133 +273,105 @@ export default function Story() {
                             attention as a home-cooked meal.
                         </p>
                     </div>
-                    <div className="origin-image-wrapper">
-                        <img
-                            src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=800&q=80"
-                            alt="Artisan food preparation"
-                            className="origin-image img-cover"
-                        />
-                    </div>
                 </div>
             </section>
 
-            {/* Values */}
+            {/* ===== TIMELINE (Horizontal Scroll) ===== */}
+            <section ref={timelineRef} className="timeline-section">
+                <div className="timeline-progress">
+                    <div className="timeline-progress-fill" />
+                </div>
+                <div className="timeline-track">
+                    {processSteps.map((step, i) => (
+                        <div key={i} className="timeline-panel">
+                            <div className="timeline-panel-inner">
+                                <div className="timeline-panel-image">
+                                    <img src={step.image} alt={step.title} />
+                                    <div className="timeline-panel-image-overlay" />
+                                </div>
+                                <div className="timeline-panel-content">
+                                    <span className="timeline-step-num">{step.num}</span>
+                                    <h3 className="timeline-step-title">{step.title}</h3>
+                                    <p className="timeline-step-desc">{step.desc}</p>
+                                </div>
+                                <div className="timeline-stroke-num">{step.num}</div>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            </section>
+
+            <SvgWave color="var(--bg-warm)" height={80} />
+
+            {/* ===== VALUES ===== */}
             <section className="values-section section section-warm">
                 <div className="container">
-                    <div className="values-header">
+                    <div className="values-heading">
                         <span className="text-label" style={{ color: 'var(--terracotta)' }}>What We Believe</span>
-                        <h2>Our <em>values</em></h2>
+                        <TextReveal
+                            text="Our Values"
+                            mode="split-words"
+                            tag="h2"
+                            className="values-title"
+                        />
                     </div>
-                    <div className="values-grid">
-                        <div className="value-card">
-                            <div className="value-number">01</div>
-                            <h3>Fresh, Always</h3>
-                            <p>
-                                Every kachori is rolled and fried fresh. Every chai is brewed to order.
-                                We never compromise on freshness — it is the foundation of everything we serve.
-                            </p>
-                        </div>
-                        <div className="value-card">
-                            <div className="value-number">02</div>
-                            <h3>Honest Flavour</h3>
-                            <p>
-                                No shortcuts, no artificial anything. Just real spices, real ingredients,
-                                and recipes that have been perfected over time.
-                            </p>
-                        </div>
-                        <div className="value-card">
-                            <div className="value-number">03</div>
-                            <h3>Warmth & Welcome</h3>
-                            <p>
-                                We believe food tastes better when it is served with warmth. Every guest
-                                at Khasta Corner is family, and every visit should feel like coming home.
-                            </p>
-                        </div>
-                    </div>
+                    <ExpandingCards items={values} />
                 </div>
             </section>
 
-            {/* Quote */}
-            <section className="story-quote section">
-                <div className="container">
-                    <blockquote className="story-quote-text">
-                        <p>
-                            "The best street food is not just about taste — it is about the
-                            feeling. That first bite that takes you back to childhood, to a
-                            crowded market, to a moment of pure joy."
-                        </p>
-                        <cite>— Khasta Corner Family</cite>
-                    </blockquote>
+            <SvgWave color="var(--bg-dark)" height={80} flip />
+
+            {/* ===== QUOTE ===== */}
+            <section ref={quoteRef} className="story-quote section">
+                <div className="container story-quote-content">
+                    <TextReveal
+                        text="The best street food is not just about taste — it is about the feeling. That first bite that takes you back."
+                        mode="split-words"
+                        tag="blockquote"
+                        className="story-quote-text"
+                    />
+                    <cite className="story-quote-cite">— Khasta Corner Family</cite>
                 </div>
             </section>
 
-            {/* Philosophy */}
-            <section className="philosophy-section section">
-                <div className="container">
-                    <div className="philosophy-header">
-                        <span className="text-label text-accent">How We Work</span>
-                        <h2>Our <em>process</em></h2>
-                    </div>
-                    <div className="philosophy-grid">
-                        <div className="philosophy-item">
-                            <div className="philosophy-line" />
-                            <div className="philosophy-content">
-                                <h4>Source</h4>
-                                <p>We carefully select fresh, local ingredients every single day.</p>
-                            </div>
-                        </div>
-                        <div className="philosophy-item">
-                            <div className="philosophy-line" />
-                            <div className="philosophy-content">
-                                <h4>Prepare</h4>
-                                <p>Hand-rolled dough, hand-ground spices, made-to-order preparations.</p>
-                            </div>
-                        </div>
-                        <div className="philosophy-item">
-                            <div className="philosophy-line" />
-                            <div className="philosophy-content">
-                                <h4>Serve</h4>
-                                <p>Hot, fresh, with a smile. Every dish leaves our kitchen at its peak.</p>
-                            </div>
-                        </div>
-                        <div className="philosophy-item">
-                            <div className="philosophy-line" />
-                            <div className="philosophy-content">
-                                <h4>Enjoy</h4>
-                                <p>The best part — watching our guests take that first, satisfying bite.</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
+            {/* ===== PARALLAX BREAK ===== */}
+            <ParallaxImage
+                src="https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=1600&q=80"
+                alt="Cafe interior"
+                height="60vh"
+                speed={0.4}
+                overlayOpacity={0.5}
+            />
 
-            {/* Full-width image */}
-            <section className="story-image-break">
-                <img
-                    src="https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=1600&q=80"
-                    alt="Cafe interior"
-                    className="img-cover"
-                />
-                <div className="story-image-overlay" />
-            </section>
+            <SvgWave color="var(--bg-warm)" height={80} />
 
-            {/* CTA */}
-            <section className="story-cta section">
-                <div className="container story-cta-content">
-                    <span className="text-label text-accent">Come By</span>
-                    <h2>
-                        The best way to know us <br />is to <em>taste</em> us
-                    </h2>
+            {/* ===== CTA ===== */}
+            <section ref={ctaRef} className="story-cta section section-warm">
+                <div className="container story-cta-inner">
+                    <span className="text-label" style={{ color: 'var(--terracotta)' }}>Come By</span>
+                    <TextReveal
+                        text="The best way to know us is to taste us"
+                        mode="split-words"
+                        tag="h2"
+                        className="story-cta-title"
+                    />
                     <div className="story-cta-buttons">
-                        <Link to="/menu" className="btn btn-primary">
-                            View Menu
-                            <svg className="btn-arrow" viewBox="0 0 20 20" fill="none">
-                                <path d="M4 10H16M16 10L11 5M16 10L11 15" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                            </svg>
-                        </Link>
-                        <Link to="/contact" className="btn btn-outline">
-                            Find Us
-                        </Link>
+                        <MagneticButton strength={0.3}>
+                            <Link to="/menu" className="btn btn-primary">
+                                View Menu
+                                <svg className="btn-arrow" viewBox="0 0 20 20" fill="none">
+                                    <path d="M4 10H16M16 10L11 5M16 10L11 15" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                                </svg>
+                            </Link>
+                        </MagneticButton>
+                        <MagneticButton strength={0.2}>
+                            <Link to="/contact" className="btn btn-outline-dark">
+                                Find Us
+                            </Link>
+                        </MagneticButton>
+                    </div>
+                    <div className="story-cta-badge">
+                        <RotatingBadge size={90} className="badge-dark" />
                     </div>
                 </div>
             </section>

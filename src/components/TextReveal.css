@@ -1,0 +1,27 @@
+.text-reveal {
+  overflow: hidden;
+}
+
+.tr-wrap {
+  display: inline-block;
+  overflow: hidden;
+  vertical-align: top;
+}
+
+.tr-item {
+  display: inline-block;
+  will-change: transform;
+}
+
+.tr-line {
+  display: block;
+  will-change: clip-path;
+}
+
+.text-reveal-stroke-fill {
+  --stroke-progress: 0;
+  -webkit-text-stroke: 2px var(--text-light);
+  color: rgba(245, 237, 227, calc(var(--stroke-progress)));
+  -webkit-text-fill-color: rgba(245, 237, 227, calc(var(--stroke-progress)));
+  transition: none;
+}
